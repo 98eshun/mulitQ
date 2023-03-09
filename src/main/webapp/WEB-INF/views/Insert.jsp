@@ -1,10 +1,12 @@
-<%@ page contentType="text/html; charset=UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8"
+		import="model.*,java.util.*"%>
 
 <!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8">
 	<title>Insert.jsp</title>
+
 </head>
 
 <body>
@@ -17,26 +19,24 @@
 		<label for="id">ID</label>
 		<input type="text" name ="id" id ="id"/>
 		<label for ="passwd">Passwd</label>
-		<input type ="password" name ="passwd" id ="passwd"/>
-		<hr>
-		<label for="gender">Gender</label><br/>
-		<label for ="man">남</label>
-		<input type="radio" name ="gender" id ="man" value="남"/>
-		<label for ="woman">여</label>
-		<input type="radio" name ="gender" id ="woman" value="여"/>
+		<input type ="text" name ="passwd" id ="passwd"/>
+		<label for ="gender">gender</label>
+		<input type ="text" name ="gender" id ="gender"/>
 	</fieldset>
 	<fieldset>
 		<legend>점수 입력</legend>
-		<label for="KO">KO</label>
-		<input type="number" name ="grade" id ="KO"/>
-		<label for="EN">EN</label>
-		<input type="number" name ="grade" id ="EN"/>
-		<label for="MT">MT</label>
-		<input type="number" name ="grade" id ="MT"/>
-		<label for="SI">SI</label>
-		<input type="number" name ="grade" id ="SI"/>
+		<label for="KO">국어</label>
+		<input type="number" name ="KO" id ="KO"/>
+		<label for="EN">영어</label>
+		<input type="number" name ="EN" id ="EN"/>
+		<label for="MT">수학</label>
+		<input type="number" name ="MT" id ="MT"/>
+		<label for="SI">과학</label>
+		<input type="number" name ="SI" id ="SI"/>
 		
-		<input type ="submit" value ="insert"/>
+		<input type = "hidden" name="command" value="in"/>
+		<input type ="submit" value ="입력"/>
+		
 	</fieldset>
 	</form>
 </body>

@@ -1,7 +1,7 @@
 create table Students(
 	id 	 		varchar(20)		 constraint Students_id_pk primary key
-,	passwd 		varchar(20) 		 constraint Students_passwd_nn not null
-,	gender 		varchar(15) 		 constraint Students_gender_nn not null
+,	passwd 		varchar(20) 	 constraint Students_passwd_nn not null
+,	gender 		varchar(15) 	 constraint Students_gender_nn not null
 );
 
 insert into Students

@@ -1,3 +1,4 @@
+<%@page import="oracle.jdbc.OracleConnection.CommitOption"%>
 <%@ page contentType="text/html; charset=UTF-8"
 			import="model.*"%>
 <%
@@ -7,8 +8,8 @@
 %>
 
 <jsp:useBean id="gradeDO" class="model.GradeDO" scope = "page"/>
-<jsp:useBean id="studentDO" class="model.StudentDO" scope = "page"/> <!-- scope = 페이지 마다 만들어라 -->
-<jsp:useBean id="studentInfoDAO" class="model.StudentInfoDAO" scope = "session"/> <!-- scope = 세션 마다 만들어라 -->
+<jsp:useBean id="studentDO" class="model.StudentDO" scope = "page"/>
+<jsp:useBean id="studentInfoDAO" class="model.StudentInfoDAO" scope = "session"/>
 <jsp:setProperty name = "gradeDO" property="*"/>
 <jsp:setProperty name = "studentDO" property="*"/>
 
@@ -20,30 +21,35 @@
 		pageContext.forward(viewPath + "Main.jsp");
 	}
 	else if(request.getMethod().equals("POST")){
-		StudentDO sDO = StudentInfoDAO.getLoginDO(loginDO);
 		
-		if(tDO != null){
-			session.setAttribute("id", tDO.getId());
-			session.setAttribute("name", tDO.getName());
-			
-			response.sendRedirect("controller.jsp");
-			//session.setAttribute("list". twitterDAO.getAllTwitter());
-			// pageContext.forward(viewPath + "twitterList.jsp")
-		}
 		if(command != null && command.equals("insert")){
 			pageContext.forward(viewPath + "Insert.jsp");
 		}
 		else if(command != null && command.equals("list")){
+			session.setAttribute("list",studentInfoDAO.getAllStudent());
+			session.setAttribute("score",studentInfoDAO.getAllGrade());
 			pageContext.forward(viewPath + "StudentList.jsp");
 		}
+		else if(command != null && command.equals("in")){
+			studentInfoDAO.insertInfo(studentDO);
+			studentInfoDAO.insertScore(gradeDO);
+			response.sendRedirect("controller.jsp");
+		}
 		else if(command != null && command.equals("modify")){
-			pageContext.forward(viewPath + "Insert.jsp");
+			pageContext.forward(viewPath + "Modify.jsp");
+		}
+		else if(command != null && command.equals("M_in")){
+			String id = request.getParameter("id");
+			studentInfoDAO.modifyScore(id,gradeDO);
+			response.sendRedirect("controller.jsp");
 		}
 		else if(command != null && command.equals("delete")){
-			pageContext.forward(viewPath + "Insert.jsp");
+			pageContext.forward(viewPath + "Delete.jsp");
 		}
-		else if(command != null && command.equals("off")){
-			pageContext.forward(viewPath + "Insert.jsp");
+		else if(command != null && command.equals("D_in")){
+			String id = request.getParameter("id");
+			studentInfoDAO.delete(studentDO);
+			response.sendRedirect("controller.jsp");
 		}
 }
 %>

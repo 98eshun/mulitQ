@@ -4,7 +4,6 @@ public class StudentDO {
 
 		private String id;
 		private String passwd;
-		private String name;
 		private String gender;
 		
 		public StudentDO() {
@@ -24,14 +23,6 @@ public class StudentDO {
 
 		public void setPasswd(String passwd) {
 			this.passwd = passwd;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
 		}
 
 		public String getGender() {

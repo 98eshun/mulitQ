@@ -11,11 +11,11 @@ public class StudentInfoDAO {
 		
 		private Connection conn = null;
 		private Statement stmt = null;
-		private PreparedStatement pstmt = null;	// 필요한 변수 private 선언
+		private PreparedStatement pstmt = null;
 		private ResultSet rs = null;
 		private String sql = null;
 		
-		public StudentInfoDAO() {	// 생성자에 서버 초기화 수행
+		public StudentInfoDAO() {
 			String jdbc_driver = "oracle.jdbc.driver.OracleDriver";
 			String jdbc_url = "jdbc:oracle:thin:@localhost:1521:XE";
 			String user = "scott";
@@ -39,6 +39,7 @@ public class StudentInfoDAO {
 				pstmt.setString(1, studentDO.getId());
 				pstmt.setString(2, studentDO.getPasswd());
 				pstmt.setString(3, studentDO.getGender());
+				pstmt.executeUpdate();
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -66,6 +67,7 @@ public class StudentInfoDAO {
 				pstmt.setInt(2, gradeDO.getEN());
 				pstmt.setInt(3, gradeDO.getMT());
 				pstmt.setInt(4, gradeDO.getSI());
+				pstmt.executeUpdate();
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -86,15 +88,15 @@ public class StudentInfoDAO {
 		public ArrayList<StudentDO> getAllStudent(){
 			ArrayList<StudentDO> list = new ArrayList<StudentDO>();
 			StudentDO studentDO = null;
-			sql = "select id, name, gender from Students;";
+			sql = "select id, passwd, gender from Students";
 			try {
 				stmt = conn.createStatement();
 				rs = stmt.executeQuery(sql);
 				
 				while(rs.next()) {
 					studentDO = new StudentDO();
-					studentDO.setId(rs.getString("id"));	//테이블의 열 이름으로 해야함
-					studentDO.setName(rs.getString("name"));
+					studentDO.setId(rs.getString("id"));
+					studentDO.setPasswd(rs.getString("passwd"));
 					studentDO.setGender(rs.getString("gender"));
 					list.add(studentDO);
 				}
@@ -118,13 +120,14 @@ public class StudentInfoDAO {
 		public ArrayList<GradeDO> getAllGrade(){
 			ArrayList<GradeDO> score = new ArrayList<GradeDO>();
 			GradeDO gradeDO = null;
-			sql = "select KO, EN, MT, SI from Grade;";
+			sql = "select id, KO, EN, MT, SI from grade";
 			try {
 				stmt = conn.createStatement();
 				rs = stmt.executeQuery(sql);
 				
 				while(rs.next()) {
 					gradeDO = new GradeDO();
+					gradeDO.setId(rs.getString("id"));
 					gradeDO.setKO(rs.getInt("KO"));
 					gradeDO.setEN(rs.getInt("EN"));
 					gradeDO.setMT(rs.getInt("MT"));
@@ -148,21 +151,20 @@ public class StudentInfoDAO {
 			return score;
 		}
 		
-		public TwitterLoginDO getLoginDO(TwitterLoginDO loginDO) {	//null값을 반환하면 로그인 실패 
-			TwitterLoginDO result = null;
-			sql = "select * from twitter_login where id = ? and passwd = ?";
+		public String findStudent(StudentDO studentDO) {
+			String result="";
+			sql = "select id, passwd "
+				+ "from students "
+				+ "where id = ? and passwd = ?";
 			
 			try {
 				pstmt = conn.prepareStatement(sql);
-				pstmt.setString(1, loginDO.getId());
-				pstmt.setString(2, loginDO.getPasswd());
+				pstmt.setString(1, studentDO.getId());
+				pstmt.setString(2, studentDO.getPasswd());
 				rs = pstmt.executeQuery();
 				
 				if(rs.next()) {
-					result = new TwitterLoginDO();
-					result.setId(rs.getString("id"));
-					result.setPasswd(rs.getString("passwd"));
-					result.setName(rs.getString("name"));
+					result += rs.getString("id") + ":::" + rs.getString("passwd");
 				}
 			}
 			catch(Exception e){
@@ -171,7 +173,116 @@ public class StudentInfoDAO {
 			
 			return result;
 		}
+		
+		public String findScore(StudentDO gradeDO) {
+			String result = null;
+			sql = "select KO, EN, MT, SI "
+				+ "from Grade"
+				+ "where id = ?";
+			
+			try {
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, gradeDO.getId());
+				rs = pstmt.executeQuery();
+				
+				if(rs.next()) {
+					result += rs.getString("KO") + rs.getString("EN") + rs.getString("MT") + rs.getString("SI"); 
+				}
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			
+			return result;
+		}
+		
+		public int modifyInfo(String id, String passwd, StudentDO studentDO) {
+			int rowCount = 0;
+			sql = "update Studnets "
+				+ "set id=?, passwd=?, gender=?"
+				+ "where id = ? and passwd = ?";
+			
+			try {
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1,studentDO.getId());
+				pstmt.setString(2,studentDO.getPasswd());
+				pstmt.setString(3,studentDO.getGender());						
+				pstmt.setString(4, id);
+				pstmt.setString(5, passwd);
+				pstmt.executeUpdate();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			finally {
+				try {
+					if(!stmt.isClosed()) {
+						stmt.close();
+					}
+				}
+				catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+			return rowCount;
+		}
+		
+		public int modifyScore(String id, GradeDO scoreDO) {
+			int rowCount = 0;
+			sql = "update Grade "
+				+ "set KO=?, EN=?, MT=?, SI=?"
+				+ "where id = ?";
+			
+			try {
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setInt(1,scoreDO.getKO());
+				pstmt.setInt(2,scoreDO.getEN());
+				pstmt.setInt(3,scoreDO.getMT());
+				pstmt.setInt(4,scoreDO.getSI());
+				pstmt.setString(5, id);
+				pstmt.executeUpdate();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			finally {
+				try {
+					if(!stmt.isClosed()) {
+						stmt.close();
+					}
+				}
+				catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+			return rowCount;
+		}
 
+		public int delete(StudentDO studentDO) {
+			int rowCount = 0;
+			sql = "delete from students where id = ?";
+			
+			try {
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1,studentDO.getId());
+				pstmt.executeUpdate();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			finally {
+				try {
+					if(!stmt.isClosed()) {
+						stmt.close();
+					}
+				}
+				catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+			return rowCount;
+		}
+			
 		public void closeConnection() {
 			try {
 				if(!conn.isClosed()) {
